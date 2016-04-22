@@ -10,6 +10,19 @@
 		strong {
 			color: #E94D58;
 		}
+		td, th {
+			padding: 0 15px;
+		}
+		.stats-list li{
+			list-style: none;
+			padding: 10px 0;
+		}
+
+		#search {
+			margin: 10px 15px 25px;
+			width: 120px;
+			height: 40px;
+		}
 	</style>
 </head>
 <body>
@@ -24,6 +37,104 @@
 			<a href="/api/tournaments">tournaments</a>
 			<span>(tour of year, tour of month, recent tour)</span>
 		</li>
+		<li>
+			<a href="/api/players">players</a>
+		</li>	
+		<li>
+			<a href="/api/player-detail">player detail</a>
+			<span>(example, you can implement this api using player url that get from players api)</span>
+		</li>
+		<li>
+			<br>
+		</li>
+		<li>
+			<span>Stats</span>
+			<ul class="stats-list">
+				<li>
+					<table>
+					<tr>
+						<button id="search" onclick="search()">
+							Go search
+						</button>
+					</tr>
+					<thead>
+						<th>stats type(统计类型)</th>
+						<th>period(时间)</th>
+						<th>surface(场地类型)</th>
+					</thead>
+					<tbody>
+						<tr>
+							<td class="stats-type">
+								<select name="" id="stats-type">
+									<option value="aces">aces</option>
+									<option value="1st-serve">
+										1st serve
+									</option>
+									<option value="1st-serve-points-won">
+										1st serve points won
+									</option>
+									<option value="2nd-serve-points-won">
+										2nd serve points won
+									</option>
+									<option value="service-games-won">
+										service games won
+									</option>
+									<option value="break-points-saved">
+										break points saved
+									</option>
+									<option value="1st-serve-return-points-won">
+										1st serve return points won
+									</option>
+									<option value="2nd-serve-return-points-won">
+										2nd serve return points won
+									</option>
+									<option value="break-points-converted">
+										break points converted
+									</option>
+									<option value="return-games-won">
+										return games won
+									</option>
+								</select>
+							</td>
+							<td class="year">
+								<select name="" id="year">
+									<option value="all">all</option>
+									<option value="2016">2016</option>
+									<option value="2015">2015</option>
+									<option value="2014">2014</option>
+									<option value="2013">2013</option>
+									<option value="2012">2012</option>
+									<option value="2011">2011</option>
+									<option value="2010">2010</option>
+									<option value="2009">2009</option>
+									<option value="2008">2008</option>
+									<option value="2007">2007</option>
+								</select>
+							</td>
+							<td class="surface">
+								<select name="" id="surface">
+									<option value="all">all</option>
+									<option value="clay">Clay(红土)</option>
+									<option value="grass">grass(草地)</option>
+									<option value="hard">hard(硬地)</option>
+								</select>
+							</td>
+						</tr>
+					</tbody>
+					</table>
+				</li>
+			</ul>
+		</li>	
 	</ul>
 </body>
+<script>
+	function search() {
+		var	type = document.getElementById('stats-type').value;
+		var	year = document.getElementById('year').value;
+		var	surface = document.getElementById('surface').value;
+
+
+		location.href = '/api/stats/'+type+'/'+year+'/'+surface;
+	}
+</script>
 </html>
