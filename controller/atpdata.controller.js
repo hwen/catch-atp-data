@@ -222,7 +222,7 @@ function getStats(req, res) {
 
 function getStatsTypeFn(statsType) {
     var fn;
-    switch(params.statsType) {
+    switch(statsType) {
         case 'aces':
             fn = getAceStats;
             break;
@@ -244,85 +244,205 @@ function getStatsTypeFn(statsType) {
         case '1st-serve-return-points-won':
             fn = getFirstSRPW;
             break;
-        case: '2nd-serve-return-points-won':
+        case '2nd-serve-return-points-won':
             fn = getSecondSRPW;
             break;
         case 'break-points-converted':
             fn = getBPC;
             break;
-        case: 'return-games-won':
+        case 'return-games-won':
             fn = getRGW;
             break;
         default:
-            res.send('getStats error');
+            fn = function(){};
     };    
-}
 
-function getFirstSPW(year, surface, callback) {
-    
-}
-
-function getSecondSPW(year, surface, callback) {
-
-}
-
-function getSGW(year, surface, callback) {
-    
-}
-
-function getBPS(year, surface, callback) {
-    
-}
-
-function getFirstSRPW(year, surface, callback) {
-    
-}
-
-function getSecondSRPW(year, surface, callback) {
-    
+    return fn;
 }
 
 function getBPC(year, surface, callback) {
-    
+    var url = 'http://www.atpworldtour.com/en/stats/break-points-converted/'+
+    year + '/' + surface + '/all/?ajax=true';
+
+    catchStatsDataPoints(url, function(data) {
+        callback(data);
+    });            
 }
 
 function getRGW(year, surface, callback) {
-    
+    var url = 'http://www.atpworldtour.com/en/stats/return-games-won/'+
+    year + '/' + surface + '/all/?ajax=true';
+
+    catchStatsDataGames(url, function(data) {
+        callback(data);
+    });     
+}
+
+function getSecondSRPW(year, surface, callback) {
+    var url = 'http://www.atpworldtour.com/en/stats/2nd-serve-return-points-won/'+
+    year + '/' + surface + '/all/?ajax=true';
+
+    catchStatsDataPoints(url, function(data) {
+        callback(data);
+    });    
+}
+
+function getFirstSRPW(year, surface, callback) {
+    var url = 'http://www.atpworldtour.com/en/stats/1st-serve-return-points-won/'+
+    year + '/' + surface + '/all/?ajax=true';
+
+    catchStatsDataPoints(url, function(data) {
+        callback(data);
+    });        
+}
+
+function getBPS(year, surface, callback) {
+    var url = 'http://www.atpworldtour.com/en/stats/break-points-saved/'+
+    year + '/' + surface + '/all/?ajax=true';
+
+    catchStatsDataPoints(url, function(data) {
+        callback(data);
+    });
+}
+
+function getSGW(year, surface, callback) {
+    var url = 'http://www.atpworldtour.com/en/stats/service-games-won/'+
+    year + '/' + surface + '/all/?ajax=true';
+
+    catchStatsDataGames(url, function(data) {
+        callback(data);
+    });
+}
+
+function getSecondSPW(year, surface, callback) {
+    var url = 'http://www.atpworldtour.com/en/stats/2nd-serve-points-won/'+
+    year + '/' + surface + '/all/?ajax=true';
+
+    catchStatsDataPoints(url, function(data) {
+        callback(data);
+    });
+}
+
+function getFirstSPW(year, surface, callback) {
+    var url = 'http://www.atpworldtour.com/en/stats/1st-serve-points-won/'+
+    year + '/' + surface + '/all/?ajax=true';
+
+    catchStatsDataPoints(url, function(data) {
+        callback(data);
+    });
 }
 
 function getFirstServe(year, surface, callback) {
-    
+    var url = 'http://www.atpworldtour.com/en/stats/1st-serve/'+
+    year + '/' + surface + '/all/?ajax=true';
+
+    catchStatsData(url, function(data, $) {
+        
+        $('.stats-listing-row').each(function(index, element) {
+            var tdArr = $(element).children();
+
+            data.detail.push({
+                rank: $( $('td', tdArr[0])[0] ).text(),
+                name: $('a', '.stats-listing-name', tdArr[0]).text(),
+                successRate: $(tdArr[1]).text(),
+                matches: $(tdArr[2]).text()
+            });
+        });
+
+        callback(data);        
+    }); 
 }
 
 function getAceStats(year, surface, callback) {
     var url = 'http://www.atpworldtour.com/en/stats/aces/'+
     year + '/' + surface + '/all/?ajax=true';
 
+    catchStatsData(url, function(aceStats, $) {
+
+        $('.stats-listing-row').each(function(index, element) {
+            var tdArr = $(element).children();
+
+            aceStats.detail.push({
+                rank: $( $('td', tdArr[0])[0] ).text(),
+                name: $('a', '.stats-listing-name', tdArr[0]).text(),
+                acesNumber: $(tdArr[1]).text(),
+                matches: $(tdArr[2]).text()
+            });
+        });
+
+        callback(aceStats);        
+    });
+}
+
+
+function catchStatsData(url, callback) {
     superagent.get(url)
         .end(function(err, sres) {
-            if (err) {
-                callback(err);
-                return;
-            }
 
             var $ = cheerio.load(sres.text);
 
-            var aceStats = {};
+            var temp = {};
 
-            aceStats.title = $('.section-title', '.stats-listing-wrapper').text();
-            aceStats.detail = [];
+            temp.title = $('.section-title', '.stats-listing-wrapper').text();
+            temp.detail = [];
+
+            callback(temp, $);
+        });    
+}
+
+
+function catchStatsDataPoints(url, callback) {
+    superagent.get(url)
+        .end(function(err, sres) {
+
+            var $ = cheerio.load(sres.text);
+
+            var temp = {};
+
+            temp.title = $('.section-title', '.stats-listing-wrapper').text();
+            temp.detail = [];
 
             $('.stats-listing-row').each(function(index, element) {
                 var tdArr = $(element).children();
 
-                aceStats.detail.push({
+                temp.detail.push({
                     rank: $( $('td', tdArr[0])[0] ).text(),
                     name: $('a', '.stats-listing-name', tdArr[0]).text(),
-                    acesNumber: $(tdArr[1]).text(),
-                    matches: $(tdArr[2]).text()
-                })
+                    percentage: $(tdArr[1]).text(),
+                    piontsWon: $(tdArr[2]).text(),
+                    totalPoints: $(tdArr[3]).text(),
+                    matches: $(tdArr[4]).text()
+                });
             });
 
-            callback(aceStats);
-        })
+            callback(temp);                 
+        });        
+}
+
+function catchStatsDataGames(url, callback) {
+    superagent.get(url)
+        .end(function(err, sres) {
+
+            var $ = cheerio.load(sres.text);
+
+            var temp = {};
+
+            temp.title = $('.section-title', '.stats-listing-wrapper').text();
+            temp.detail = [];
+
+            $('.stats-listing-row').each(function(index, element) {
+                var tdArr = $(element).children();
+
+                temp.detail.push({
+                    rank: $( $('td', tdArr[0])[0] ).text(),
+                    name: $('a', '.stats-listing-name', tdArr[0]).text(),
+                    percentage: $(tdArr[1]).text(),
+                    gamesWon: $(tdArr[2]).text(),
+                    totalGames: $(tdArr[3]).text(),
+                    matches: $(tdArr[4]).text()
+                });
+            });
+
+            callback(temp);                 
+        });        
 }
