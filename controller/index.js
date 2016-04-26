@@ -1,7 +1,7 @@
 'use strict';
 
 var express = require('express');
-var controller = require('./atpdata.controller');
+var controller = require('./atpdata');
 
 var router = express.Router();
 
