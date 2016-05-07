@@ -5,7 +5,7 @@ catch atp data from official website and return json format data
 
 ##How to use
 1.git clone or download zip         
-2.in project root dir, open your terminal and run (**insure that you had installed node and npm**)        
+2.in project root dir, open your terminal and run (**make sure that you had installed node and npm**)        
 ```javascript
 npm install
 ```
