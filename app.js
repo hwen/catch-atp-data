@@ -15,7 +15,7 @@ app.use(bodyParser.json({
     limit:'5000mb'
 }));
 
-app.use('/api', require('./controller'));
+app.use('/api', require('./lib'));
 
 app.get('/', function(req, res) {
 	res.sendfile('./index.html');
